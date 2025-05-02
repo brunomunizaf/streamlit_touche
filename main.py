@@ -15,18 +15,36 @@ root = tk.Tk()
 root.title("Touché | Caixa de tampa solta (mm)")
 
 params_base = {
-    'Comprimento': tk.DoubleVar(value=150),
-    'Largura': tk.DoubleVar(value=150),
-    'Altura': tk.DoubleVar(value=80),
+    'Comprimento': tk.IntVar(value=150),
+    'Largura': tk.IntVar(value=150),
+    'Altura': tk.IntVar(value=80),
     'Espessura': tk.DoubleVar(value=1.9),
 }
 
+preset_base_sizes = {
+    "10x15": (100, 150),
+    "20x20": (200, 200),
+    "20x25": (200, 250),
+    "20x30": (200, 300),
+    "25x30": (250, 300),
+    "30x30": (300, 300),
+    "30x35": (300, 350),
+}
+
 params_tampa = {
-    'Comprimento': tk.DoubleVar(value=350),
-    'Largura': tk.DoubleVar(value=100),
-    'Altura': tk.DoubleVar(value=80),
+    'Comprimento': tk.IntVar(value=350),
+    'Largura': tk.IntVar(value=100),
+    'Altura': tk.IntVar(value=80),
     'Espessura': tk.DoubleVar(value=1.9),
 }
+
+def apply_preset_base_size(event):
+    value = combo_preset.get()
+    if value in preset_base_sizes:
+        comp, larg = preset_base_sizes[value]
+        params_base['Comprimento'].set(comp)
+        params_base['Largura'].set(larg)
+        update_preview_base()
 
 def generate_dxf_base():
     try:
@@ -120,15 +138,15 @@ canvas_base.get_tk_widget().pack(side='top', fill='both', expand=True)
 bottom_base = ttk.Frame(frame_base)
 bottom_base.pack(side='bottom', fill='x', padx=20, pady=10)
 
-for nome, var in params_base.items():
+for name, var in params_base.items():
     frame = ttk.Frame(bottom_base)
     frame.pack(fill='x', pady=2)
-    ttk.Label(frame, text=nome + " (mm)", width=14).pack(side='left')
+    ttk.Label(frame, text=name + " (mm)", width=14).pack(side='left')
     entry = ttk.Entry(frame, textvariable=var, width=10)
     entry.pack(side='right', padx=5)
     entry.bind('<KeyRelease>', update_preview_base())
 
-    scale_range = (0, 3) if nome == 'Espessura' else (0, 1000)
+    scale_range = (0, 3) if name == 'Espessura' else (0, 600)
 
     scale = ttk.Scale(
         frame, from_=scale_range[0], to=scale_range[1],
@@ -136,6 +154,11 @@ for nome, var in params_base.items():
         command=lambda val: update_preview_base()
     )
     scale.pack(side='left', fill='x', expand=True, padx=5)
+
+combo_preset = ttk.Combobox(bottom_base, values=list(preset_base_sizes.keys()), state="readonly")
+combo_preset.set("Tamanhos pré-definidos")
+combo_preset.pack(pady=5)
+combo_preset.bind("<<ComboboxSelected>>", apply_preset_base_size)
 
 button_frame = ttk.Frame(bottom_base)
 button_frame.pack(pady=10)
@@ -159,15 +182,15 @@ canvas_tampa.get_tk_widget().pack(side='top', fill='both', expand=True)
 bottom_tampa = ttk.Frame(frame_tampa)
 bottom_tampa.pack(side='bottom', fill='x', padx=20, pady=10)
 
-for nome, var in params_tampa.items():
+for name, var in params_tampa.items():
     frame = ttk.Frame(bottom_tampa)
     frame.pack(fill='x', pady=2)
-    ttk.Label(frame, text=nome + " (mm)", width=14).pack(side='left')
+    ttk.Label(frame, text=name + " (mm)", width=14).pack(side='left')
     entry = ttk.Entry(frame, textvariable=var, width=10)
     entry.pack(side='right', padx=5)
     entry.bind('<KeyRelease>', update_preview_tampa())
 
-    scale_range = (0, 3) if nome == 'Espessura' else (0, 1000)
+    scale_range = (0, 3) if name == 'Espessura' else (0, 1000)
 
     scale = ttk.Scale(
         frame, from_=scale_range[0], to=scale_range[1],
