@@ -20,27 +20,27 @@ root.geometry("1200x800")
 
 # Parâmetros
 params = {
-    'Altura da base (mm)': tk.IntVar(value=150),
-    'Largura da base (mm)': tk.IntVar(value=150),
-    'Profundidade (mm)': tk.IntVar(value=80),
-    'Altura da tampa (mm)': tk.DoubleVar(value=20),
+    'Altura da base (cm)': tk.DoubleVar(value=15),
+    'Largura da base (cm)': tk.DoubleVar(value=20),
+    'Profundidade (cm)': tk.IntVar(value=8),
+    'Altura da tampa (cm)': tk.DoubleVar(value=2),
     'Espessura (mm)': tk.DoubleVar(value=1.9),
 }
 
 preset_tamanhos = {
-    "10cm x 15cm": (100, 150),
-    "20cm x 20cm": (200, 200),
-    "20cm x 25cm": (200, 250),
-    "20cm x 30cm": (200, 300),
-    "25cm x 30cm": (250, 300),
-    "30cm x 30cm": (300, 300),
-    "30cm x 35cm": (300, 350),
-    "35cm x 40cm": (350, 400),
+    "10cm x 15cm": (10, 15),
+    "20cm x 20cm": (20, 20),
+    "20cm x 25cm": (20, 25),
+    "20cm x 30cm": (20, 30),
+    "25cm x 30cm": (25, 30),
+    "30cm x 30cm": (30, 30),
+    "30cm x 35cm": (30, 35),
+    "35cm x 40cm": (35, 40),
 }
 
 projetos_anteriores = {
-    "[Gabriel Bacelar] Icon": (100, 150),
-    "[LFDJ] Dia dos Namorados 2024": (350, 400),
+    "[Gabriel Bacelar] Icon": (10, 15),
+    "[LFDJ] Dia dos Namorados 2024": (35, 40),
 }
 
 espessuras_disponiveis = [
@@ -54,16 +54,16 @@ espessuras_disponiveis = [
 def update_preview(event=None):
     draw_preview_top(
         ax_top,
-        params['Largura da base (mm)'].get(),
-        params['Altura da base (mm)'].get(),
-        params['Altura da tampa (mm)'].get(),
+        params['Largura da base (cm)'].get(),
+        params['Altura da base (cm)'].get(),
+        params['Altura da tampa (cm)'].get(),
         params['Espessura (mm)'].get()
     )
     draw_preview_base(
         ax_base,
-        params['Largura da base (mm)'].get(),
-        params['Altura da base (mm)'].get(),
-        params['Profundidade (mm)'].get(),
+        params['Largura da base (cm)'].get(),
+        params['Altura da base (cm)'].get(),
+        params['Profundidade (cm)'].get(),
         params['Espessura (mm)'].get(),
     )
     canvas.draw()
@@ -81,10 +81,10 @@ def gerar_svg():
     if caminho:
         export_to_svg(
             caminho,
-            params['Largura da base (mm)'].get(),
-            params['Altura da base (mm)'].get(),
-            params['Profundidade (mm)'].get(),
-            params['Altura da tampa (mm)'].get(),
+            params['Largura da base (cm)'].get(),
+            params['Altura da base (cm)'].get(),
+            params['Profundidade (cm)'].get(),
+            params['Altura da tampa (cm)'].get(),
             params['Espessura (mm)'].get()
         )
         mostrar_alerta_temporario(f"Linha de corte exportada com sucesso.")
@@ -138,8 +138,8 @@ def aplicar_preset(event):
     valor = combo_preset.get()
     if valor in preset_tamanhos:
         comp, larg = preset_tamanhos[valor]
-        params['Altura da base (mm)'].set(comp)
-        params['Largura da base (mm)'].set(larg)
+        params['Altura da base (cm)'].set(comp)
+        params['Largura da base (cm)'].set(larg)
         update_preview()
 
 # Frame principal
@@ -189,7 +189,7 @@ for nome, var in params.items():
         entry.pack(side='right')
         entry.bind("<KeyRelease>", update_preview)
 
-        scale_range = (0, 600)
+        scale_range = (0, 30)
         scale = ttk.Scale(
             frame, from_=scale_range[0], to=scale_range[1],
             orient='horizontal', variable=var,
@@ -205,16 +205,16 @@ preset_group.pack(fill='x', pady=(10, 10))
 def aplicar_preset_nome(nome):
     if nome in preset_tamanhos:
         comp, larg = preset_tamanhos[nome]
-        params['Altura da base (mm)'].set(comp)
-        params['Largura da base (mm)'].set(larg)
+        params['Altura da base (cm)'].set(comp)
+        params['Largura da base (cm)'].set(larg)
         update_preview()
 
 def aplicar_projeto_anterior(event):
     nome = combo_projetos.get()
     if nome in projetos_anteriores:
         altura, largura = projetos_anteriores[nome]
-        params['Altura da base (mm)'].set(altura)
-        params['Largura da base (mm)'].set(largura)
+        params['Altura da base (cm)'].set(altura)
+        params['Largura da base (cm)'].set(largura)
         update_preview()
 
 # Container em grade para botões
@@ -248,7 +248,6 @@ botoes = ttk.Frame(controls_frame)
 botoes.pack(pady=5, anchor='center')
 ttk.Button(botoes, text="Exportar SVG", command=gerar_svg).pack(side='left', padx=5)
 ttk.Button(botoes, text="Versionamento", command=mostrar_changelog).pack(side='left', padx=5)
-
 
 # Inicia preview
 update_preview()
