@@ -31,7 +31,7 @@ def export_to_svg(file_name, width, height, depth_base, depth_top, thickness):
     )
 
     def add_vinco(x0, y0, x1, y1):
-        dwg.add(dwg.polyline([(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)], stroke="red", fill="none", stroke_width='0.1mm'))
+        dwg.add(dwg.polyline([(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)], stroke="red", fill="none", stroke_width='0.1'))
 
     def draw_base(x_offset, y_offset):
         x0, y0 = x_offset + T + D1, y_offset + T + D1
@@ -43,7 +43,7 @@ def export_to_svg(file_name, width, height, depth_base, depth_top, thickness):
 
         add_vinco(x0, y0, x1, y1)
 
-        path = dwg.path(stroke="black", fill="none", stroke_width='0.1mm')
+        path = dwg.path(stroke="black", fill="none", stroke_width='0.1')
 
         path.push("M", x0, y1)
         path.push("L", x0 - T, y1, x0 - T, y1 + D2_local, x0, y1 + D2_local, x0, y1 + D,
@@ -73,7 +73,7 @@ def export_to_svg(file_name, width, height, depth_base, depth_top, thickness):
 
         add_vinco(x0, y0, x1, y1)
 
-        path = dwg.path(stroke="black", fill="none", stroke_width='0.1mm')
+        path = dwg.path(stroke="black", fill="none", stroke_width='0.1')
 
         path.push("M", x0, y1)
         path.push("L", x0 - T, y1, x0 - T, y1 + D2_local, x0, y1 + D2_local, x0, y1 + D,
