@@ -160,7 +160,7 @@ def draw_preview_base(ax, width, height, depth, thickness):
     # No final de draw_preview_base(...)
     x_center = (ax.get_xlim()[0] + ax.get_xlim()[1]) / 2
     y_center = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
-    ax.text(x_center, y_center, "Base", fontsize=16, color="gray", ha='center', va='center')
+    ax.text(x_center, y_center, "Caixa", fontsize=16, color="gray", ha='center', va='center')
 
     # Desenhar régua horizontal acima da base
     regua_y = y1 + D + 10  # um pouco acima da aba superior
