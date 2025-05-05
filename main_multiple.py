@@ -12,7 +12,7 @@ from math_touche import export_to_svg, draw_preview_base, draw_preview_top
 desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
 
 # Janela principal
-VERSAO_ATUAL = "v0.1.0"
+VERSAO_ATUAL = "v0.2.0"
 
 root = tk.Tk()
 root.title(f"Touché | Caixa de tampa solta – {VERSAO_ATUAL}")
@@ -113,7 +113,19 @@ def mostrar_alerta_temporario(msg, tempo=3000):
 
 def mostrar_changelog():
     changelog = """
-Touché | Caixa de tampa solta - v0.1.0
+Touché | Caixa de tampa solta - v0.2.0
+
+ADICIONADO
+- Campo de folga (cm) agora tem um checkbutton ao lado que permite ativar/desativar o uso manual
+- Folga pode ser calculada automaticamente com base na espessura do papelão (desmarcando o botão).
+
+ALTERADO
+- Removido funcionalidade de tamanhos padronizados e de projetos anteriores
+- Renomeado parametros para facilitar entendimento
+- Radio buttons foram isolados em uma seção própria
+- Parâmetros de tampa foram isolados
+
+_____ v0.1.0
 
 ADICIONADO
 - Visualização ao vivo da base e tampa com réguas, etiquetas e medidas dinâmicas
