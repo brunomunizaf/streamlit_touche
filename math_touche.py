@@ -1,24 +1,30 @@
 import math
 import svgwrite
 
-def export_to_svg(file_name, width, height, depth_base, depth_top, thickness):
+def export_to_svg(file_name, width, height, depth_base, depth_top, thickness, folga=None):
     W = width * 10
     H = height * 10
     D1 = depth_base * 10
     D2 = depth_top * 10
     T = thickness
 
-    if thickness in (1.90, 2.00):
-        folga = 7.0
-    elif thickness == 2.50:
-        folga = 8.0
-    else:
-        folga = thickness * 3
+    #if W > 100 or H > 100:
+    #    folga = 7
+    #else:
+    #    folga = 6
+
+    if folga is None:
+        if thickness in (1.90, 2.00):
+            folga = 7.0
+        elif thickness == 2.50:
+            folga = 8.0
+        else:
+            folga = thickness * 3
 
     WT = W + folga
     HT = H + folga
 
-    margin = 50
+    margin = 5
 
     total_height = (H + 2 * D1 + 2 * T) + (HT + 2 * D2 + 2 * T) + margin
     total_width = max(W + 2 * D1 + 2 * T, WT + 2 * D2 + 2 * T)
@@ -194,17 +200,29 @@ def draw_preview_base(ax, width, height, depth, thickness):
     ax.text(x_ref + 5, (y_ext_inf + y_ext_sup) / 2, f"{altura_total/10:.1f} cm", ha='left', va='center', fontsize=9, color='blue', rotation=90)
     
 
-def draw_preview_top(ax, width, height, depth, thickness):
+def draw_preview_top(ax, width, height, depth, thickness, folga=None, folga_var=None):
     ax.clear()
     ax.set_aspect('equal')
     ax.axis('off')
 
-    if thickness in (1.90, 2.00):
-        folga = 7.0
-    elif thickness == 2.50:
-        folga = 8.0
-    else:
-        folga = thickness * 3  # fallback para valores fora dos padrões
+    if folga is None:
+        if thickness in (1.90, 2.00):
+            folga = 7.0
+        elif thickness == 2.50:
+            folga = 8.0
+        else:
+            folga = thickness * 3  # fallback para valores fora dos padrões
+
+        # Atualiza o campo na interface, se fornecido
+        if folga_var is not None:
+            folga_var.set(folga)
+        else:
+            folga_var.set(0)
+
+    #if width > 10.0 or height > 10.0:
+    #    folga = 7
+    #else:
+    #    folga = 6
 
     W = (width * 10) + folga
     H = (height * 10) + folga
@@ -266,7 +284,7 @@ def draw_preview_top(ax, width, height, depth, thickness):
         y0, y0, y1, y1, y0
     ], 'red', linewidth=1)
     ax.text((x0 + x1) / 2, y0 + 5, f"{W/10:.1f} cm", ha='center', fontsize=8)
-    ax.text(x1 - 15, (y0 + y1) / 2, f"{H/10:.1f} cm", rotation=90, va='center', fontsize=8)
+    ax.text(x1 - 20, (y0 + y1) / 2, f"{H/10:.1f} cm", rotation=90, va='center', fontsize=8)
 
     x_center = (ax.get_xlim()[0] + ax.get_xlim()[1]) / 2
     y_center = (ax.get_ylim()[0] + ax.get_ylim()[1]) / 2

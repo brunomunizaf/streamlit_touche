@@ -16,26 +16,24 @@ VERSAO_ATUAL = "v0.1.0"
 
 root = tk.Tk()
 root.title(f"Touché | Caixa de tampa solta – {VERSAO_ATUAL}")
-root.geometry("1200x800")
+root.geometry("850x800")
 
 # Parâmetros
-params = {
-    'Altura da base (cm)': tk.DoubleVar(value=15),
-    'Largura da base (cm)': tk.DoubleVar(value=20),
-    'Profundidade (cm)': tk.IntVar(value=8),
-    'Altura da tampa (cm)': tk.DoubleVar(value=2),
-    'Espessura (mm)': tk.DoubleVar(value=1.9),
+params_tampa = {
+    'Folga (mm)': tk.DoubleVar(value=6),
+    'Profundidade (cm)': tk.DoubleVar(value=2),
 }
 
-preset_tamanhos = {
-    "10cm x 15cm": (10, 15),
-    "20cm x 20cm": (20, 20),
-    "20cm x 25cm": (20, 25),
-    "20cm x 30cm": (20, 30),
-    "25cm x 30cm": (25, 30),
-    "30cm x 30cm": (30, 30),
-    "30cm x 35cm": (30, 35),
-    "35cm x 40cm": (35, 40),
+usar_folga_personalizada = tk.BooleanVar(value=False)
+
+params_caixa = {
+    'Largura (cm)': tk.DoubleVar(value=20),
+    'Comprimento (cm)': tk.DoubleVar(value=15),
+    'Profundidade (cm)': tk.DoubleVar(value=8),
+}
+
+params_geral = {
+    'Espessura (mm)': tk.DoubleVar(value=1.9)
 }
 
 projetos_anteriores = {
@@ -50,21 +48,31 @@ espessuras_disponiveis = [
     2.55
 ]
 
+folga = None
+
 # Atualiza preview
 def update_preview(event=None):
+    # Definir folga com base no checkbutton
+    if usar_folga_personalizada.get():
+        folga_valor = params_tampa['Folga (mm)'].get()
+    else:
+        folga_valor = None
+
     draw_preview_top(
         ax_top,
-        params['Largura da base (cm)'].get(),
-        params['Altura da base (cm)'].get(),
-        params['Altura da tampa (cm)'].get(),
-        params['Espessura (mm)'].get()
+        params_caixa['Largura (cm)'].get(),
+        params_caixa['Comprimento (cm)'].get(),
+        params_tampa['Profundidade (cm)'].get(),
+        params_geral['Espessura (mm)'].get(),
+        folga_valor,
+        params_tampa['Folga (mm)'] if not usar_folga_personalizada.get() else None
     )
     draw_preview_base(
         ax_base,
-        params['Largura da base (cm)'].get(),
-        params['Altura da base (cm)'].get(),
-        params['Profundidade (cm)'].get(),
-        params['Espessura (mm)'].get(),
+        params_caixa['Largura (cm)'].get(),
+        params_caixa['Comprimento (cm)'].get(),
+        params_caixa['Profundidade (cm)'].get(),
+        params_geral['Espessura (mm)'].get(),
     )
     canvas.draw()
 
@@ -78,14 +86,22 @@ def gerar_svg():
         initialfile=file_name,
         title="Salvar arquivo SVG"
     )
+
+    # Definir folga com base no checkbutton
+    if usar_folga_personalizada.get():
+        folga_valor = params_tampa['Folga (mm)'].get()
+    else:
+        folga_valor = None
+
     if caminho:
         export_to_svg(
             caminho,
-            params['Largura da base (cm)'].get(),
-            params['Altura da base (cm)'].get(),
-            params['Profundidade (cm)'].get(),
-            params['Altura da tampa (cm)'].get(),
-            params['Espessura (mm)'].get()
+            params_caixa['Largura (cm)'].get(),
+            params_caixa['Comprimento (cm)'].get(),
+            params_caixa['Profundidade (cm)'].get(),
+            params_tampa['Profundidade (cm)'].get(),
+            params_geral['Espessura (mm)'].get(),
+            folga_valor
         )
         mostrar_alerta_temporario(f"Linha de corte exportada com sucesso.")
 
@@ -132,45 +148,91 @@ CORRIGIDO
     text.config(state='disabled')
     text.pack(fill='both', expand=True)
 
-
-# Aplica tamanhos predefinidos
-def aplicar_preset(event):
-    valor = combo_preset.get()
-    if valor in preset_tamanhos:
-        comp, larg = preset_tamanhos[valor]
-        params['Altura da base (cm)'].set(comp)
-        params['Largura da base (cm)'].set(larg)
-        update_preview()
-
 # Frame principal
 main_frame = ttk.Frame(root)
 main_frame.pack(fill='both', expand=True, padx=10, pady=10)
 
 # Frame esquerdo (preview)
 preview_frame = ttk.Frame(main_frame)
-preview_frame.pack(side='left', fill='both', expand=True, padx=(0, 20))
+preview_frame.pack(side='left', fill='both', expand=True, padx=(0, 10))
 
 fig = plt.Figure(figsize=(2, 8), dpi=120)
 ax_top = fig.add_subplot(211)
 ax_base = fig.add_subplot(212)
 
 canvas = FigureCanvasTkAgg(fig, master=preview_frame)
-
-canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.X, expand=False)
+canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.X)
 canvas.get_tk_widget().configure(width=400, height=1000)
 
 # Frame direito (controles)
 controls_frame = ttk.Frame(main_frame)
 controls_frame.pack(side='left', fill='y')
 
-inputs = ttk.LabelFrame(controls_frame, text="Parâmetros", padding=15)
-inputs.pack(fill="x")
+# Parâmetros da tampa
+inputs_tampa = ttk.LabelFrame(controls_frame, text="Parâmetros da tampa", padding=15)
+inputs_tampa.pack(fill="x")
 
-for nome, var in params.items():
-    frame = ttk.Frame(inputs)
+for nome, var in params_tampa.items():
+    frame = ttk.Frame(inputs_tampa)
     frame.pack(fill='x', pady=4)
 
-    ttk.Label(frame, text=nome, width=20).pack(side='left')
+    ttk.Label(frame, text=nome, width=15).pack(side='left')
+
+    if nome == 'Folga (mm)':
+        # Subframe para checkbox + entry colados
+        folga_frame = ttk.Frame(frame)
+        folga_frame.pack(side='right')
+
+        chk = ttk.Checkbutton(folga_frame, variable=usar_folga_personalizada, text="🔓", command=update_preview)
+        chk.pack(side='left')
+
+        entry = ttk.Entry(folga_frame, textvariable=var, width=5)
+        entry.pack(side='right', padx=(0, 0))
+        entry.bind("<KeyRelease>", update_preview)
+    else:
+        entry = ttk.Entry(frame, textvariable=var, width=5)
+        entry.pack(side='right')
+        entry.bind("<KeyRelease>", update_preview)
+
+        scale_range = (0, 10)
+        scale = ttk.Scale(
+            frame, from_=scale_range[0], to=scale_range[1],
+            orient='horizontal', variable=var,
+            command=lambda val: update_preview()
+        )
+        scale.pack(side='left', fill='x', expand=True, padx=5)
+
+# Parâmetros da caixa
+inputs_caixa = ttk.LabelFrame(controls_frame, text="Parâmetros da caixa", padding=15)
+inputs_caixa.pack(fill="x", pady=10)
+
+for nome, var in params_caixa.items():
+    frame = ttk.Frame(inputs_caixa)
+    frame.pack(fill='x', pady=4)
+
+    ttk.Label(frame, text=nome, width=15).pack(side='left')
+
+    entry = ttk.Entry(frame, textvariable=var, width=5)
+    entry.pack(side='right')
+    entry.bind("<KeyRelease>", update_preview)
+
+    scale_range = (0, 30)
+    scale = ttk.Scale(
+        frame, from_=scale_range[0], to=scale_range[1],
+        orient='horizontal', variable=var,
+        command=lambda val: update_preview()
+    )
+    scale.pack(side='left', fill='x', expand=True, padx=5)
+
+# Parâmetros da gerais
+inputs_geral = ttk.LabelFrame(controls_frame, text="Parâmetros gerais", padding=15)
+inputs_geral.pack(fill="x")
+
+for nome, var in params_geral.items():
+    frame = ttk.Frame(inputs_geral)
+    frame.pack(fill='x', pady=4)
+
+    ttk.Label(frame, text=nome, width=12).pack(side='left')
 
     if nome == 'Espessura (mm)':
         radiobutton_frame = ttk.Frame(frame)
@@ -189,59 +251,13 @@ for nome, var in params.items():
         entry.pack(side='right')
         entry.bind("<KeyRelease>", update_preview)
 
-        scale_range = (0, 30)
+        scale_range = (0, 5)
         scale = ttk.Scale(
             frame, from_=scale_range[0], to=scale_range[1],
             orient='horizontal', variable=var,
             command=lambda val: update_preview()
         )
         scale.pack(side='left', fill='x', expand=True, padx=5)
-
-
-# Frame com rótulo "Tamanhos padrões"
-preset_group = ttk.LabelFrame(controls_frame, text="Tamanho padrão", padding=10)
-preset_group.pack(fill='x', pady=(10, 10))
-
-def aplicar_preset_nome(nome):
-    if nome in preset_tamanhos:
-        comp, larg = preset_tamanhos[nome]
-        params['Altura da base (cm)'].set(comp)
-        params['Largura da base (cm)'].set(larg)
-        update_preview()
-
-def aplicar_projeto_anterior(event):
-    nome = combo_projetos.get()
-    if nome in projetos_anteriores:
-        altura, largura = projetos_anteriores[nome]
-        params['Altura da base (cm)'].set(altura)
-        params['Largura da base (cm)'].set(largura)
-        update_preview()
-
-# Container em grade para botões
-preset_frame = ttk.Frame(preset_group)
-preset_frame.pack(fill='x')
-
-# Cria botões em duas colunas
-colunas = 2
-for i, nome in enumerate(preset_tamanhos):
-    row = i // colunas
-    col = i % colunas
-    btn = ttk.Button(preset_frame, text=nome, width=18, command=lambda n=nome: aplicar_preset_nome(n))
-    btn.grid(row=row, column=col, padx=5, pady=4, sticky='ew')
-
-# Frame com rótulo "Projetos anteriores"
-previous_group = ttk.LabelFrame(controls_frame, text="Projetos anteriores", padding=10)
-previous_group.pack(fill='x', pady=(10, 10))
-
-# Container para projetos anteriores
-previous_frame = ttk.Frame(previous_group)
-previous_frame.pack(fill='x')
-
-# Combobox dentro do grupo "Projetos anteriores"
-combo_projetos = ttk.Combobox(previous_frame, values=list(projetos_anteriores.keys()), state="readonly")
-combo_projetos.set("Selecione um projeto")
-combo_projetos.pack(fill='x', pady=5)
-combo_projetos.bind("<<ComboboxSelected>>", aplicar_projeto_anterior)
 
 # Botões
 botoes = ttk.Frame(controls_frame)
