@@ -1,4 +1,3 @@
-import os
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import asksaveasfilename
@@ -8,10 +7,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from math_touche import export_to_svg, draw_preview_base, draw_preview_top
 
-# Caminho Desktop
-desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-
-# Janela principal
 VERSAO_ATUAL = "v0.2.0"
 
 root = tk.Tk()
@@ -34,11 +29,6 @@ params_caixa = {
 
 params_geral = {
     'Espessura (mm)': tk.DoubleVar(value=1.9)
-}
-
-projetos_anteriores = {
-    "[Gabriel Bacelar] Icon": (10, 15),
-    "[LFDJ] Dia dos Namorados 2024": (35, 40),
 }
 
 espessuras_disponiveis = [
@@ -110,55 +100,6 @@ def mostrar_alerta_temporario(msg, tempo=3000):
     alerta = tk.Label(root, text=msg, bg='green', fg='white', font=('Arial', 10, 'bold'))
     alerta.place(relx=0.5, rely=0.97, anchor='center')
     root.after(tempo, alerta.destroy)
-
-def mostrar_changelog():
-    changelog = """
-Touché | Caixa de tampa solta - v0.2.0
-
-ADICIONADO
-- Campo de folga (cm) agora tem um checkbutton ao lado que permite ativar/desativar o uso manual
-- Folga pode ser calculada automaticamente com base na espessura do papelão (desmarcando o botão).
-
-ALTERADO
-- Removido funcionalidade de tamanhos padronizados e de projetos anteriores
-- Renomeado parametros para facilitar entendimento
-- Radio buttons foram isolados em uma seção própria
-- Parâmetros de tampa foram isolados
-
-_____ v0.1.0
-
-ADICIONADO
-- Visualização ao vivo da base e tampa com réguas, etiquetas e medidas dinâmicas
-- Cálculo automático de folga da tampa com base na espessura do papelão
-- Exportação de linha de corte para SVG unificado (base + tampa)
-- Interface gráfica completa em Tkinter com preview interativo via Matplotlib
-- Campos de entrada com sliders e Combobox para parâmetros como espessura
-- Presets de tamanho com botões organizados em LabelFrame
-- Seção de projetos anteriores com Combobox para seleção rápida
-- Exibição de etiquetas no centro das imagens ("Base", "Tampa")
-- Cálculo e exibição das dimensões totais abertas da caixa
-- Layout vertical organizado entre previews e controles
-
-ALTERADO
-- Terminologia ajustada: profundidade passou a representar a altura real da aba
-- Visualizações separadas da tampa e base foram empilhadas verticalmente
-- Substituição de slider para espessura por seleção via Combobox
-
-CORRIGIDO
-- Preenchimento incorreto em visualizações SVG
-- Sobreposição de textos com limites de imagem ajustados
-- Bug de formatação ao calcular medidas com valores do tipo str
-"""
-
-    popup = tk.Toplevel(root)
-    popup.title("Changelog")
-    popup.geometry("600x500")
-    popup.resizable(False, False)
-
-    text = tk.Text(popup, wrap='word', padx=10, pady=10)
-    text.insert('1.0', changelog)
-    text.config(state='disabled')
-    text.pack(fill='both', expand=True)
 
 # Frame principal
 main_frame = ttk.Frame(root)
@@ -275,7 +216,6 @@ for nome, var in params_geral.items():
 botoes = ttk.Frame(controls_frame)
 botoes.pack(pady=5, anchor='center')
 ttk.Button(botoes, text="Exportar SVG", command=gerar_svg).pack(side='left', padx=5)
-ttk.Button(botoes, text="Versionamento", command=mostrar_changelog).pack(side='left', padx=5)
 
 # Inicia preview
 update_preview()

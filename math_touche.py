@@ -1,4 +1,3 @@
-import math
 import svgwrite
 
 def export_to_svg(file_name, width, height, depth_base, depth_top, thickness, folga=None):
