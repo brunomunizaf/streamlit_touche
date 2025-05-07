@@ -212,11 +212,11 @@ def draw_preview_top(ax, width, height, depth, thickness, folga=None, folga_var=
         else:
             folga = thickness * 3  # fallback para valores fora dos padrões
 
-        # Atualiza o campo na interface, se fornecido
-        if folga_var is not None:
-            folga_var.set(folga)
-        else:
-            folga_var.set(0)
+    # Atualiza o campo na interface, se fornecido
+    if folga_var is not None:
+        folga_var.set(folga)
+    else:
+        folga_var.set(0)
 
     #if width > 10.0 or height > 10.0:
     #    folga = 7

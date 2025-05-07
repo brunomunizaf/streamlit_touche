@@ -42,7 +42,6 @@ folga = None
 
 # Atualiza preview
 def update_preview(event=None):
-    # Definir folga com base no checkbutton
     if usar_folga_personalizada.get():
         folga_valor = params_tampa['Folga (mm)'].get()
     else:
